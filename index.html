@@ -3,227 +3,43 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="In Good Company"/>
-  <meta name="theme-color" content="#121f2b"/>
-  <title>In Good Company</title>
-  <link rel="manifest" href="manifest.json"/>
-  <link rel="apple-touch-icon" href="icon-192.png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>In Good Company — Preview</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #121f2b;   /* deep mountain sky */
+      --bg:        #121f2b;
       --bg2:       #1a2c3d;
       --bg3:       #233547;
       --border:    #2e4560;
       --border2:   #3a566e;
-      --text:      #dde8ee;   /* frost on glass */
-      --muted:     #5a7e96;   /* frozen lake slate */
-      --warm:      #7bc4dc;   /* icy clear blue — Move */
-      --sage:      #5c9e82;   /* dark spruce — Show Up */
-      --rose:      #c47a3a;   /* fireplace ember — Connect */
+      --text:      #dde8ee;
+      --muted:     #5a7e96;
+      --warm:      #7bc4dc;
+      --sage:      #5c9e82;
+      --rose:      #c47a3a;
       --warm-dim:  rgba(123,196,220,0.12);
       --sage-dim:  rgba(92,158,130,0.12);
       --rose-dim:  rgba(196,122,58,0.13);
-      --gold:      #c47a3a;
-      --greige:    #dde8ee;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+    .app { max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 80px; }
 
-    body {
-      background: var(--bg);
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    .app { max-width: 100%; min-height: 100vh; padding-bottom: 80px; }
-
-    /* ── Header ── */
     .header { padding: 20px 22px 0; background: linear-gradient(180deg, #0c1720 0%, transparent 100%); }
-    .header.hidden { display: none; }
+    .wordmark { font-family: 'DM Serif Display', serif; font-size: 22px; font-weight: 400; color: var(--text); }
+    .wordmark em { font-style: italic; color: #c47a3a; }
+    .tagline { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; }
+    .header-meta { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-top: 14px; }
+    .date-lbl { font-size: 11px; color: var(--muted); }
 
-    .wordmark {
-      font-family: 'DM Serif Display', serif;
-      font-size: 22px;
-      font-weight: 400;
-      color: var(--text);
-      letter-spacing: 0.01em;
-    }
+    .body { padding: 20px 22px 40px; }
+    .switch-user { font-size: 11px; color: var(--muted); margin-bottom: 20px; }
+    .switch-user span { color: var(--warm); cursor: pointer; text-decoration: underline; }
 
-    .wordmark em {
-      font-style: italic;
-      color: #c47a3a;
-    }
-
-    .tagline {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 400;
-      margin-top: 2px;
-      letter-spacing: 0.04em;
-    }
-
-    .header-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border);
-      margin-top: 14px;
-    }
-
-    .date-lbl {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 400;
-    }
-
-    /* ── Join screen ── */
-    .join-screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 28px;
-      background: #dde8ee;
-    }
-
-    .join-hero { text-align: center; margin-bottom: 48px; }
-
-    .join-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 42px;
-      font-weight: 400;
-      line-height: 1.1;
-      color: #121f2b;
-      margin-bottom: 6px;
-    }
-
-    .join-title em {
-      font-style: italic;
-      color: #c47a3a;
-    }
-
-    .join-tagline {
-      font-size: 14px;
-      color: #3a5a72;
-      font-weight: 300;
-      margin-top: 10px;
-    }
-
-    .join-pillars {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 28px;
-    }
-
-    .join-pillar {
-      background: #c8d8e4;
-      border: 1px solid #aec4d4;
-      padding: 10px 14px;
-      text-align: center;
-      border-radius: 8px;
-    }
-
-    .join-pillar-icon { font-size: 20px; display: block; margin-bottom: 4px; }
-    .join-pillar-lbl { font-size: 10px; color: #3a5a72; font-weight: 500; }
-
-    .join-box {
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .join-prompt {
-      font-size: 11px;
-      color: #3a5a72;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      margin-bottom: 10px;
-    }
-
-    .join-input {
-      width: 100%;
-      background: #c8d8e4;
-      border: 1px solid #aec4d4;
-      border-bottom: 2px solid #121f2b;
-      color: #121f2b;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 20px;
-      font-weight: 400;
-      padding: 12px 16px;
-      outline: none;
-      border-radius: 6px 6px 0 0;
-      margin-bottom: 12px;
-    }
-
-    .join-input::placeholder { color: #7a9db5; }
-
-    .join-btn {
-      width: 100%;
-      background: #121f2b;
-      border: none;
-      color: #dde8ee;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 14px;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: opacity 0.15s;
-      letter-spacing: 0.02em;
-    }
-
-    .join-btn:hover { opacity: 0.88; }
-
-    /* ── Body ── */
-    .body { padding: 20px 22px 40px; display: none; }
-    .body.visible { display: block; }
-
-    .switch-user {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-
-    .switch-user span {
-      color: var(--warm);
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    /* ── Habit tabs ── */
-    .habit-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 22px;
-    }
-
-    .habit-tab {
-      flex: 1;
-      padding: 10px 6px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'DM Sans', sans-serif;
-    }
-
+    .habit-tabs { display: flex; gap: 8px; margin-bottom: 22px; }
+    .habit-tab { flex: 1; padding: 10px 6px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
     .habit-tab-icon { font-size: 18px; display: block; margin-bottom: 3px; }
-    .habit-tab-lbl {
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--muted);
-      display: block;
-    }
-
+    .habit-tab-lbl { font-size: 10px; font-weight: 500; color: var(--muted); display: block; }
     .habit-tab.active-move { border-color: var(--warm); background: var(--warm-dim); }
     .habit-tab.active-move .habit-tab-lbl { color: var(--warm); }
     .habit-tab.active-show { border-color: var(--sage); background: var(--sage-dim); }
@@ -231,468 +47,109 @@
     .habit-tab.active-connect { border-color: var(--rose); background: var(--rose-dim); }
     .habit-tab.active-connect .habit-tab-lbl { color: #e09060; }
 
-    /* ── Habit panels ── */
     .habit-panel { display: none; }
     .habit-panel.visible { display: block; }
 
-    /* ── Log card ── */
-    .log-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      margin-bottom: 16px;
-    }
-
-    .log-card-label {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      margin-bottom: 14px;
-    }
-
+    .log-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+    .log-card-label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.05em; margin-bottom: 14px; }
     .log-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-
-    .log-input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-bottom: 2px solid var(--warm);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 28px;
-      font-weight: 300;
-      padding: 8px 14px;
-      outline: none;
-      border-radius: 6px 6px 0 0;
-      -webkit-appearance: none;
-    }
-
-    .log-input.sage-accent { border-bottom-color: var(--sage); }
-    .log-input.rose-accent { border-bottom-color: var(--rose); }
-
-    .log-btn {
-      background: var(--warm);
-      border: none;
-      color: var(--bg);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 0 18px;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: opacity 0.15s;
-    }
-
-    .log-btn:hover { opacity: 0.85; }
+    .log-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-bottom: 2px solid var(--warm); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 28px; font-weight: 300; padding: 8px 14px; outline: none; border-radius: 6px 6px 0 0; -webkit-appearance: none; }
+    .log-btn { background: var(--warm); border: none; color: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 0 18px; cursor: pointer; border-radius: 6px; }
     .log-btn.sage { background: var(--sage); }
     .log-btn.rose { background: var(--rose); }
-
     .saved-msg { font-size: 11px; color: var(--warm); height: 16px; }
-    .saved-msg.sage { color: var(--sage); }
-    .saved-msg.rose { color: var(--rose); }
 
-    /* ── Check-in button (Show Up) ── */
-    .checkin-btn {
-      width: 100%;
-      background: var(--sage-dim);
-      border: 1px solid var(--sage);
-      color: var(--sage);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 16px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.2s;
-      letter-spacing: 0.02em;
-    }
+    .goal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .goal-track { height: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+    .goal-fill { height: 100%; background: var(--warm); border-radius: 2px; }
+    .goal-input-small { width: 80px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 3px 8px; outline: none; border-radius: 4px; text-align: center; }
+    .past-toggle { background: none; border: none; color: var(--warm); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; padding: 0; margin-top: 10px; }
 
-    .checkin-btn:hover { background: rgba(122,170,138,0.22); }
-    .checkin-btn.done {
-      background: var(--sage);
-      color: var(--bg);
-      cursor: default;
-    }
+    .checkin-btn { width: 100%; background: var(--sage-dim); border: 1px solid var(--sage); color: var(--sage); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; padding: 16px; cursor: pointer; border-radius: 8px; letter-spacing: 0.02em; }
+    .checkin-btn.done { background: var(--sage); color: var(--bg); }
 
-    /* ── Connect check-in ── */
-    .connect-btn {
-      width: 100%;
-      background: var(--rose-dim);
-      border: 1px solid var(--rose);
-      color: var(--rose);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 16px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
+    .connect-btn { width: 100%; background: var(--rose-dim); border: 1px solid var(--rose); color: var(--rose); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; padding: 16px; cursor: pointer; border-radius: 8px; }
 
-    .connect-btn:hover { background: rgba(196,122,122,0.22); }
-
-    .monthly-track {
-      margin-top: 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
-    }
-
-    .monthly-lbl {
-      font-size: 10px;
-      color: var(--muted);
-      font-weight: 500;
-      margin-bottom: 10px;
-    }
-
+    .monthly-track { margin-top: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+    .monthly-lbl { font-size: 10px; color: var(--muted); font-weight: 500; margin-bottom: 10px; }
     .monthly-dots { display: flex; gap: 8px; }
-
-    .dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--border);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-    }
-
+    .dot { width: 28px; height: 28px; border-radius: 50%; background: var(--border); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 12px; }
     .dot.done { background: var(--rose); border-color: var(--rose); }
 
-    /* ── Board ── */
-    .section-label {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-      margin-top: 22px;
-    }
+    .section-label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.05em; margin-bottom: 12px; margin-top: 22px; }
 
-    .board-row {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--border2);
-      border-radius: 8px;
-      padding: 14px 16px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .board-row { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--border2); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
     .board-row.me { border-left-color: var(--warm); }
     .board-row.logged-show { border-left-color: var(--sage); }
     .board-row.logged-connect { border-left-color: var(--rose); }
 
-    .board-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Serif Display', serif;
-      font-size: 15px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-
+    .board-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--muted); flex-shrink: 0; }
     .board-avatar.me { border-color: var(--warm); color: var(--warm); }
 
     .board-info { flex: 1; }
-
-    .board-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
+    .board-name { font-size: 14px; font-weight: 500; color: var(--text); }
     .board-name.me { color: var(--warm); }
 
-    .board-habits {
-      display: flex;
-      gap: 6px;
-      margin-top: 5px;
-    }
+    .board-habits { display: flex; gap: 6px; margin-top: 5px; }
+    .habit-chip { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; border: 1px solid var(--border); color: var(--muted); background: var(--bg3); }
+    .habit-chip.move-done { color: var(--warm); border-color: rgba(123,196,220,0.3); background: var(--warm-dim); }
+    .habit-chip.show-done { color: var(--sage); border-color: rgba(92,158,130,0.3); background: var(--sage-dim); }
+    .habit-chip.connect-done { color: var(--rose); border-color: rgba(196,122,58,0.3); background: var(--rose-dim); }
 
-    .habit-chip {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-weight: 500;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: var(--bg3);
-    }
-
-    .habit-chip.move-done { color: var(--warm); border-color: rgba(201,169,110,0.3); background: var(--warm-dim); }
-    .habit-chip.show-done { color: var(--sage); border-color: rgba(122,170,138,0.3); background: var(--sage-dim); }
-    .habit-chip.connect-done { color: var(--rose); border-color: rgba(196,122,122,0.3); background: var(--rose-dim); }
-
-    .board-steps {
-      font-family: 'DM Serif Display', serif;
-      font-size: 22px;
-      color: var(--text);
-      text-align: right;
-    }
-
+    .board-steps { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); text-align: right; }
     .board-steps.me { color: var(--warm); }
     .board-steps.zero { color: var(--border2); }
-    .board-unit {
-      font-size: 9px;
-      color: var(--muted);
-      text-align: right;
-      font-family: 'DM Sans', sans-serif;
-    }
+    .board-unit { font-size: 9px; color: var(--muted); text-align: right; }
+    .not-yet-lbl { font-size: 10px; color: var(--border2); font-style: italic; margin-top: 2px; }
 
-    .not-yet-lbl {
-      font-size: 10px;
-      color: var(--border2);
-      font-style: italic;
-      margin-top: 2px;
-    }
+    .reacts { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .react-chip { background: var(--bg3); border: 1px solid var(--border); padding: 3px 9px; font-size: 12px; cursor: pointer; color: var(--muted); border-radius: 20px; }
+    .react-add { background: none; border: 1px dashed var(--border2); padding: 3px 9px; font-size: 10px; cursor: pointer; color: var(--muted); border-radius: 20px; }
 
-    /* ── Goal bar ── */
-    .goal-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
+    .leader-card { background: linear-gradient(135deg, rgba(196,122,58,0.18) 0%, rgba(196,122,58,0.06) 100%); border: 1px solid rgba(196,122,58,0.5); border-left: 3px solid #c47a3a; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .leader-crown { font-size: 22px; flex-shrink: 0; }
+    .leader-label { font-size: 9px; color: #c47a3a; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+    .leader-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); }
+    .leader-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .stats-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    .stat-tile { flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 8px; text-align: center; }
+    .stat-val { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--warm); line-height: 1; }
+    .stat-lbl { font-size: 8px; color: var(--muted); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; }
+    .footer { font-size: 10px; color: var(--border2); text-align: center; margin-top: 32px; font-style: italic; font-family: 'DM Serif Display', serif; }
 
-    .goal-track {
-      height: 4px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .goal-fill {
-      height: 100%;
-      background: var(--warm);
-      border-radius: 2px;
-      transition: width 0.5s;
-    }
-
-    .goal-input-small {
-      width: 80px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      padding: 3px 8px;
-      outline: none;
-      border-radius: 4px;
-      text-align: center;
-    }
-
-    /* ── Past day ── */
-    .past-toggle {
-      background: none;
-      border: none;
-      color: var(--warm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      cursor: pointer;
-      padding: 0;
-      margin-top: 10px;
-    }
-
-    .past-row {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-    }
-
-    .past-row-inner { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-
-    select.past-select {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-bottom: 2px solid var(--warm);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      padding: 8px 10px;
-      outline: none;
-      border-radius: 4px 4px 0 0;
-    }
-
-    .past-amount {
-      width: 90px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-bottom: 2px solid var(--warm);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 16px;
-      font-weight: 300;
-      padding: 8px 10px;
-      outline: none;
-      -webkit-appearance: none;
-      border-radius: 4px 4px 0 0;
-    }
-
-    .past-save {
-      background: var(--warm);
-      border: none;
-      color: var(--bg);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 10px 14px;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-
-    /* ── Reactions ── */
-    .reacts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 8px;
-    }
-
-    .react-chip {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      padding: 3px 9px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--muted);
-      border-radius: 20px;
-    }
-
-    .react-add {
-      background: none;
-      border: 1px dashed var(--border2);
-      padding: 3px 9px;
-      font-size: 10px;
-      cursor: pointer;
-      color: var(--muted);
-      border-radius: 20px;
-    }
-
-    .picker { display: none; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
-    .picker.open { display: flex; }
-
-    /* ── Milestone ── */
-    .milestone {
-      display: none;
-      position: fixed;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg2);
-      border: 1px solid var(--warm);
-      padding: 16px 24px;
-      border-radius: 12px;
-      text-align: center;
-      z-index: 999;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-      max-width: 280px;
-      width: 90%;
-    }
-
-    .milestone.show { display: block; animation: popIn 0.3s ease; }
-
-    @keyframes popIn {
-      from { transform: translateX(-50%) scale(0.85); opacity: 0; }
-      to   { transform: translateX(-50%) scale(1);    opacity: 1; }
-    }
-
-    .m-emoji { font-size: 36px; display: block; margin-bottom: 8px; }
-    .m-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--warm); }
-    .m-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-    /* ── Footer ── */
-    .footer {
-      font-size: 10px;
-      color: var(--border2);
-      text-align: center;
-      margin-top: 32px;
-      font-style: italic;
-      font-family: 'DM Serif Display', serif;
-    }
+    /* Tab switcher at top for preview */
+    .preview-bar { background: #0c1720; border-bottom: 1px solid var(--border); padding: 8px 22px; display: flex; gap: 16px; }
+    .preview-btn { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; padding: 4px 0; border: none; background: none; font-family: 'DM Sans', sans-serif; }
+    .preview-btn.active { color: var(--warm); border-bottom: 1px solid var(--warm); }
   </style>
 </head>
 <body>
 
-<div class="milestone" id="milestone">
-  <span class="m-emoji" id="mEmoji">🎉</span>
-  <div class="m-title" id="mTitle"></div>
-  <div class="m-sub" id="mSub"></div>
-</div>
-
 <div class="app">
-
-  <!-- Header -->
-  <div class="header hidden" id="mainHeader">
+  <div class="header">
     <div class="header-meta">
       <div>
         <div class="wordmark">In <em>Good</em> Company</div>
         <div class="tagline">Good habits are better together.</div>
       </div>
-      <div class="date-lbl" id="dateLbl"></div>
+      <div class="date-lbl">Mon, Oct 26</div>
     </div>
   </div>
 
-  <!-- Join screen -->
-  <div class="join-screen" id="joinScreen">
-    <div class="join-hero">
-      <div class="join-title">In <em>Good</em><br>Company</div>
-      <div class="join-tagline">Good habits are better together.</div>
-      <div class="join-pillars">
-        <div class="join-pillar">
-          <span class="join-pillar-icon">👟</span>
-          <span class="join-pillar-lbl">Move</span>
-        </div>
-        <div class="join-pillar">
-          <span class="join-pillar-icon">🏋️</span>
-          <span class="join-pillar-lbl">Work Out</span>
-        </div>
-        <div class="join-pillar">
-          <span class="join-pillar-icon">🫂</span>
-          <span class="join-pillar-lbl">Connect</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="join-box">
-      <div class="join-prompt">What should we call you? Alias names welcomed.</div>
-      <input class="join-input" id="joinInput" type="text" placeholder="Your name" autocomplete="off"/>
-      <button class="join-btn" onclick="joinBoard()">Let's go!</button>
-    </div>
-  </div>
-
-  <!-- App body -->
-  <div class="body" id="appBody">
-    <div class="switch-user">Hey, <strong id="displayName"></strong> · <span onclick="switchUser()">not you?</span></div>
+  <div class="body">
+    <div class="switch-user">Hey, <strong>Rebecca</strong> · <span>not you?</span></div>
 
     <!-- Habit tabs -->
     <div class="habit-tabs">
-      <div class="habit-tab active-move" id="tabMove" onclick="switchHabit('move')">
+      <div class="habit-tab active-move" id="tabMove" onclick="switchTab('move')">
         <span class="habit-tab-icon">👟</span>
         <span class="habit-tab-lbl">Move</span>
       </div>
-      <div class="habit-tab" id="tabShow" onclick="switchHabit('show')">
+      <div class="habit-tab" id="tabShow" onclick="switchTab('show')">
         <span class="habit-tab-icon">🏋️</span>
         <span class="habit-tab-lbl">Work Out</span>
       </div>
-      <div class="habit-tab" id="tabConnect" onclick="switchHabit('connect')">
+      <div class="habit-tab" id="tabConnect" onclick="switchTab('connect')">
         <span class="habit-tab-icon">🫂</span>
         <span class="habit-tab-lbl">Connect</span>
       </div>
@@ -704,473 +161,256 @@
         <div class="log-card-label">Log today's steps</div>
         <div class="log-input-row">
           <input type="number" placeholder="0000" class="log-input" id="stepInput"/>
-          <button class="log-btn" onclick="logSteps()">Save</button>
+          <button class="log-btn">Save</button>
         </div>
-        <div class="saved-msg" id="stepSavedMsg"></div>
-
+        <div class="saved-msg"></div>
         <div class="goal-row" style="margin-top:10px;">
           <div style="font-size:10px;color:var(--muted);">Daily goal</div>
-          <input type="number" class="goal-input-small" id="stepGoalInput" value="8000" onchange="updateStepGoal()"/>
+          <input type="number" class="goal-input-small" value="8000"/>
         </div>
-        <div class="goal-track"><div class="goal-fill" id="stepGoalFill" style="width:0%"></div></div>
+        <div class="goal-track"><div class="goal-fill" style="width:78%"></div></div>
+        <button class="past-toggle">+ Log a past day</button>
+      </div>
 
-        <button class="past-toggle" onclick="togglePastSteps()">+ Log a past day</button>
-        <div id="pastStepsRow" style="display:none;" class="past-row">
-          <div style="font-size:10px;color:var(--muted);">Which day?</div>
-          <div class="past-row-inner">
-            <select class="past-select" id="pastDaySelect"></select>
-            <input type="number" placeholder="steps" class="past-amount" id="pastStepAmt"/>
-            <button class="past-save" onclick="logPastSteps()">Save</button>
-          </div>
-          <div class="saved-msg" id="pastStepMsg" style="margin-top:6px;"></div>
+      <div class="leader-card">
+        <div class="leader-crown">👑</div>
+        <div>
+          <div class="leader-label">Monthly leader</div>
+          <div class="leader-name">Jamie</div>
+          <div class="leader-sub">187,340 steps — October total</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-tile">
+          <div class="stat-val">26,570</div>
+          <div class="stat-lbl">Team today</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-val">428K</div>
+          <div class="stat-lbl">Month total</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-val">Jamie</div>
+          <div class="stat-lbl">Most active</div>
         </div>
       </div>
 
       <div class="section-label">How everyone's moving today</div>
-      <div id="moveBoard"></div>
+
+      <!-- Board rows -->
+      <div class="board-row me">
+        <div class="board-avatar me">RE</div>
+        <div class="board-info">
+          <div class="board-name me">Rebecca</div>
+          <div class="reacts">
+            <button class="react-chip">👏 2</button>
+            <button class="react-chip">🔥 1</button>
+            <button class="react-add">+ react</button>
+          </div>
+        </div>
+        <div>
+          <div class="board-steps me">6,240</div>
+          <div class="board-unit">steps</div>
+        </div>
+      </div>
+
+      <div class="board-row">
+        <div class="board-avatar">JF</div>
+        <div class="board-info">
+          <div class="board-name">Jamie</div>
+          <div class="reacts">
+            <button class="react-chip">🥳 1</button>
+            <button class="react-add">+ react</button>
+          </div>
+        </div>
+        <div>
+          <div class="board-steps">11,430</div>
+          <div class="board-unit">steps</div>
+        </div>
+      </div>
+
+      <div class="board-row">
+        <div class="board-avatar">KL</div>
+        <div class="board-info">
+          <div class="board-name">Kira</div>
+          <div class="reacts"><button class="react-add">+ react</button></div>
+        </div>
+        <div>
+          <div class="board-steps">8,900</div>
+          <div class="board-unit">steps</div>
+        </div>
+      </div>
+
+      <div class="board-row">
+        <div class="board-avatar">MO</div>
+        <div class="board-info">
+          <div class="board-name">Marco</div>
+          <div class="not-yet-lbl">hasn't logged yet</div>
+        </div>
+        <div>
+          <div class="board-steps zero">—</div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:28px;">Monthly steps · <span style="color:var(--text);font-weight:400;">October</span></div>
+
+      <div class="board-row">
+        <div class="board-avatar">JF</div>
+        <div class="board-info"><div class="board-name">Jamie</div></div>
+        <div>
+          <div class="board-steps">187,340</div>
+          <div class="board-unit">this month</div>
+        </div>
+      </div>
+
+      <div class="board-row">
+        <div class="board-avatar">KL</div>
+        <div class="board-info"><div class="board-name">Kira</div></div>
+        <div>
+          <div class="board-steps">142,800</div>
+          <div class="board-unit">this month</div>
+        </div>
+      </div>
+
+      <div class="board-row me">
+        <div class="board-avatar me">RE</div>
+        <div class="board-info"><div class="board-name me">Rebecca</div></div>
+        <div>
+          <div class="board-steps me">98,410</div>
+          <div class="board-unit">this month</div>
+        </div>
+      </div>
+
+      <div class="board-row">
+        <div class="board-avatar">MO</div>
+        <div class="board-info">
+          <div class="board-name">Marco</div>
+          <div class="not-yet-lbl">no steps logged yet</div>
+        </div>
+        <div><div class="board-steps zero">—</div></div>
+      </div>
     </div>
 
     <!-- SHOW UP panel -->
     <div class="habit-panel" id="panelShow">
       <div class="log-card">
         <div class="log-card-label">Did you work out today?</div>
-        <button class="checkin-btn" id="showUpBtn" onclick="logShowUp()">I worked out today</button>
-        <div class="saved-msg sage" id="showSavedMsg" style="margin-top:10px;"></div>
+        <button class="checkin-btn">I worked out today</button>
+        <div class="saved-msg sage" style="margin-top:10px;"></div>
       </div>
 
       <div class="section-label">Who worked out this week</div>
-      <div id="showBoard"></div>
+
+      <div class="board-row me logged-show">
+        <div class="board-avatar me">RE</div>
+        <div class="board-info"><div class="board-name me">Rebecca</div></div>
+        <div>
+          <div class="board-steps me">3</div>
+          <div class="board-unit">days</div>
+        </div>
+      </div>
+
+      <div class="board-row logged-show">
+        <div class="board-avatar">JF</div>
+        <div class="board-info"><div class="board-name">Jamie</div></div>
+        <div>
+          <div class="board-steps">5</div>
+          <div class="board-unit">days</div>
+        </div>
+      </div>
+
+      <div class="board-row logged-show">
+        <div class="board-avatar">KL</div>
+        <div class="board-info"><div class="board-name">Kira</div></div>
+        <div>
+          <div class="board-steps">2</div>
+          <div class="board-unit">days</div>
+        </div>
+      </div>
+
+      <div class="board-row">
+        <div class="board-avatar">MO</div>
+        <div class="board-info">
+          <div class="board-name">Marco</div>
+          <div class="not-yet-lbl">none this week yet</div>
+        </div>
+        <div><div class="board-steps zero">—</div></div>
+      </div>
     </div>
 
     <!-- CONNECT panel -->
     <div class="habit-panel" id="panelConnect">
       <div class="log-card">
         <div class="log-card-label">Spent time with a friend?</div>
-        <button class="connect-btn" onclick="logConnect()">Log a hangout</button>
-        <div class="saved-msg rose" id="connectSavedMsg" style="margin-top:10px;"></div>
+        <button class="connect-btn">Log a hangout</button>
+        <div class="saved-msg rose" style="margin-top:10px;"></div>
 
         <div class="monthly-track">
           <div class="monthly-lbl">Your connects this month (goal: 2)</div>
-          <div class="monthly-dots" id="myMonthlyDots">
-            <div class="dot" id="dot1"></div>
-            <div class="dot" id="dot2"></div>
+          <div class="monthly-dots">
+            <div class="dot done">✓</div>
+            <div class="dot"></div>
           </div>
         </div>
       </div>
 
       <div class="section-label">Who's connecting this month</div>
-      <div id="connectBoard"></div>
+
+      <div class="board-row logged-connect">
+        <div class="board-avatar">JF</div>
+        <div class="board-info">
+          <div class="board-name">Jamie</div>
+          <div style="font-size:10px;color:var(--rose);margin-top:2px;">Monthly goal reached 😊</div>
+        </div>
+        <div>
+          <div class="board-steps">3</div>
+          <div class="board-unit">this month</div>
+        </div>
+      </div>
+
+      <div class="board-row me logged-connect">
+        <div class="board-avatar me">RE</div>
+        <div class="board-info"><div class="board-name me">Rebecca</div></div>
+        <div>
+          <div class="board-steps me">1</div>
+          <div class="board-unit">this month</div>
+        </div>
+      </div>
+
+      <div class="board-row logged-connect">
+        <div class="board-avatar">KL</div>
+        <div class="board-info"><div class="board-name">Kira</div></div>
+        <div>
+          <div class="board-steps">1</div>
+          <div class="board-unit">this month</div>
+        </div>
+      </div>
+
+      <div class="board-row">
+        <div class="board-avatar">MO</div>
+        <div class="board-info">
+          <div class="board-name">Marco</div>
+          <div class="not-yet-lbl">no hangouts logged yet</div>
+        </div>
+        <div><div class="board-steps zero">—</div></div>
+      </div>
     </div>
 
     <div class="footer">good habits are better together</div>
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-  // ── REPLACE WITH YOUR FIREBASE CONFIG ──────────────────────────────────────
-  const firebaseConfig = {
-    apiKey:            "AIzaSyCEr99pXHSW4N_5SfkU_7JcR6_Ml10T78c",
-    authDomain:        "ingoodco.firebaseapp.com",
-    databaseURL:       "https://ingoodco-default-rtdb.firebaseio.com",
-    projectId:         "ingoodco",
-    storageBucket:     "ingoodco.firebasestorage.app",
-    messagingSenderId: "1044109077366",
-    appId:             "1:1044109077366:web:747e188c9b49c1d929e857"
-  };
-  // ───────────────────────────────────────────────────────────────────────────
-
-  const app = initializeApp(firebaseConfig);
-  const db  = getDatabase(app);
-
-  const EMOJI = ['🔥','👏','🥳'];
-
-  let myName        = localStorage.getItem('igc-name') || '';
-  let currentHabit  = 'move';
-  let stepGoal      = parseInt(localStorage.getItem('igc-step-goal') || '8000');
-  let currentReactKey = '';
-
-  // ── Timezone ──────────────────────────────────────────────────────────────
-  function getETStr(d) {
-    return (d || new Date()).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-  }
-  function today() { return getETStr(); }
-
-  function monthKey() {
-    const d = new Date();
-    return d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }).slice(0, 7); // YYYY-MM
-  }
-
-  function weekKey() {
-    const etStr = getETStr();
-    const d = new Date(etStr + 'T12:00:00');
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    const mon = new Date(d);
-    mon.setDate(diff);
-    return getETStr(mon);
-  }
-
-  function fmt(n) { return Number(n || 0).toLocaleString(); }
-
-  function initials(name) {
-    return name.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-  }
-
-  // ── Date label ────────────────────────────────────────────────────────────
-  document.getElementById('dateLbl').textContent =
-    new Date().toLocaleDateString('en-US', {
-      weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/New_York'
+<script>
+  function switchTab(h) {
+    ['Move','Show','Connect'].forEach(t => {
+      document.getElementById('tab'+t).className = 'habit-tab';
+      document.getElementById('panel'+t).classList.remove('visible');
     });
-
-  // ── Join ──────────────────────────────────────────────────────────────────
-  window.joinBoard = async function() {
-    const name = document.getElementById('joinInput').value.trim();
-    if (!name) return;
-    myName = name;
-    localStorage.setItem('igc-name', name);
-    showApp();
-  };
-
-  window.switchUser = function() {
-    localStorage.removeItem('igc-name');
-    myName = '';
-    document.getElementById('mainHeader').classList.add('hidden');
-    document.getElementById('joinScreen').style.display = 'flex';
-    document.getElementById('appBody').classList.remove('visible');
-  };
-
-  async function showApp() {
-    document.getElementById('joinScreen').style.display = 'none';
-    document.getElementById('mainHeader').classList.remove('hidden');
-    document.getElementById('appBody').classList.add('visible');
-    document.getElementById('displayName').textContent = myName;
-
-    // Register member
-    await set(ref(db, `members/${myName.replace(/\s/g, '_')}`), true);
-
-    // Personal step goal
-    stepGoal = parseInt(localStorage.getItem('igc-step-goal') || '8000');
-    document.getElementById('stepGoalInput').value = stepGoal;
-
-    // Load my step goal bar
-    const myKey = myName.replace(/\s/g, '_');
-    const mySnap = await get(ref(db, `steps/${today()}/${myKey}`));
-    if (mySnap.exists()) updateStepGoalBar(mySnap.val());
-
-    // Load show up button state
-    const showSnap = await get(ref(db, `showup/${today()}/${myKey}`));
-    if (showSnap.exists()) markShowUpDone();
-
-    // Load my monthly connect dots
-    loadMyConnectDots();
-
-    switchHabit('move');
-
-    // Real-time listener for steps
-    onValue(ref(db, `steps/${today()}`), () => {
-      if (currentHabit === 'move') loadMoveBoard();
-    });
-  }
-
-  // ── Habit tabs ────────────────────────────────────────────────────────────
-  window.switchHabit = function(h) {
-    currentHabit = h;
-    ['move','show','connect'].forEach(t => {
-      document.getElementById(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).className = 'habit-tab';
-      document.getElementById(`panel${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.remove('visible');
-    });
-    document.getElementById(`tabMove`).className    = h === 'move'    ? 'habit-tab active-move'    : 'habit-tab';
-    document.getElementById(`tabShow`).className    = h === 'show'    ? 'habit-tab active-show'    : 'habit-tab';
-    document.getElementById(`tabConnect`).className = h === 'connect' ? 'habit-tab active-connect' : 'habit-tab';
-
-    document.getElementById(`panel${h.charAt(0).toUpperCase()+h.slice(1)}`).classList.add('visible');
-
-    if (h === 'move')    loadMoveBoard();
-    if (h === 'show')    loadShowBoard();
-    if (h === 'connect') loadConnectBoard();
-  };
-
-  // ── MOVE ──────────────────────────────────────────────────────────────────
-  window.logSteps = async function() {
-    const amount = parseInt(document.getElementById('stepInput').value);
-    if (!amount || amount < 1) return;
-    const key = myName.replace(/\s/g, '_');
-    await set(ref(db, `steps/${today()}/${key}`), amount);
-    updateStepGoalBar(amount);
-    document.getElementById('stepInput').value = '';
-    const msg = document.getElementById('stepSavedMsg');
-    msg.textContent = `✓ ${fmt(amount)} steps logged`;
-    setTimeout(() => msg.textContent = '', 2500);
-    if (amount >= stepGoal) showMilestone('🏆', 'Goal crushed!', `${fmt(amount)} steps today.`);
-    loadMoveBoard();
-  };
-
-  function updateStepGoalBar(amount) {
-    const goal = parseInt(document.getElementById('stepGoalInput').value) || stepGoal;
-    const pct = Math.min(100, Math.round((amount / goal) * 100));
-    document.getElementById('stepGoalFill').style.width = pct + '%';
-  }
-
-  window.updateStepGoal = function() {
-    stepGoal = parseInt(document.getElementById('stepGoalInput').value) || 8000;
-    localStorage.setItem('igc-step-goal', stepGoal);
-  };
-
-  window.togglePastSteps = function() {
-    const row = document.getElementById('pastStepsRow');
-    const isHidden = row.style.display === 'none';
-    row.style.display = isHidden ? 'block' : 'none';
-    if (isHidden) {
-      const sel = document.getElementById('pastDaySelect');
-      sel.innerHTML = '';
-      for (let i = 1; i <= 7; i++) {
-        const d = new Date(today() + 'T12:00:00');
-        d.setDate(d.getDate() - i);
-        const val = getETStr(d);
-        const lbl = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-        const opt = document.createElement('option');
-        opt.value = val;
-        opt.textContent = lbl;
-        sel.appendChild(opt);
-      }
-    }
-  };
-
-  window.logPastSteps = async function() {
-    const amount = parseInt(document.getElementById('pastStepAmt').value);
-    const date   = document.getElementById('pastDaySelect').value;
-    if (!amount || !date) return;
-    await set(ref(db, `steps/${date}/${myName.replace(/\s/g, '_')}`), amount);
-    const msg = document.getElementById('pastStepMsg');
-    msg.textContent = `✓ Saved`;
-    setTimeout(() => msg.textContent = '', 2500);
-    document.getElementById('pastStepAmt').value = '';
-  };
-
-  async function loadMoveBoard() {
-    const snap = await get(ref(db, `steps/${today()}`));
-    const data = snap.exists() ? snap.val() : {};
-    const allSnap = await get(ref(db, 'members'));
-    let players = [];
-    if (allSnap.exists()) {
-      players = Object.keys(allSnap.val()).map(k => ({
-        name: k.replace(/_/g, ' '),
-        key: k,
-        steps: parseInt(data[k] || 0)
-      }));
-    }
-    players.sort((a, b) => b.steps - a.steps);
-    currentReactKey = today();
-
-    const board = document.getElementById('moveBoard');
-    board.innerHTML = '';
-    if (players.length === 0) {
-      board.innerHTML = `<div style="text-align:center;padding:30px 0;color:var(--muted);font-size:12px;">No one's logged yet. Be first.</div>`;
-      return;
-    }
-    players.forEach((p, i) => {
-      const isMe = p.name.toLowerCase() === myName.toLowerCase();
-      const hasLogged = p.steps > 0;
-      const div = document.createElement('div');
-      div.className = 'board-row' + (isMe ? ' me' : '');
-      div.innerHTML = `
-        <div class="board-avatar${isMe ? ' me' : ''}">${initials(p.name)}</div>
-        <div class="board-info">
-          <div class="board-name${isMe ? ' me' : ''}">${p.name}</div>
-          ${!hasLogged ? `<div class="not-yet-lbl">hasn't logged yet</div>` : ''}
-          <div class="reacts" id="mreacts-${i}"></div>
-        </div>
-        <div>
-          <div class="board-steps${isMe ? ' me' : ''}${!hasLogged ? ' zero' : ''}">${hasLogged ? fmt(p.steps) : '—'}</div>
-          <div class="board-unit">${hasLogged ? 'steps' : ''}</div>
-        </div>`;
-      board.appendChild(div);
-      if (hasLogged) loadReacts('move', p.name, i, 'mreacts');
-    });
-  }
-
-  // ── SHOW UP ───────────────────────────────────────────────────────────────
-  window.logShowUp = async function() {
-    const key = myName.replace(/\s/g, '_');
-    await set(ref(db, `showup/${today()}/${key}`), true);
-    markShowUpDone();
-    showMilestone('✅', 'You worked out!', 'That\'s the whole game.');
-    loadShowBoard();
-  };
-
-  function markShowUpDone() {
-    const btn = document.getElementById('showUpBtn');
-    btn.textContent = '✓ Worked out today';
-    btn.classList.add('done');
-    btn.onclick = null;
-    const msg = document.getElementById('showSavedMsg');
-    msg.textContent = 'Logged for today.';
-  }
-
-  async function loadShowBoard() {
-    // Load this whole week
-    const days = [];
-    const etStr = today();
-    const monday = new Date(etStr + 'T12:00:00');
-    const day = monday.getDay();
-    monday.setDate(monday.getDate() - day + (day === 0 ? -6 : 1));
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const dateStr = getETStr(d);
-      if (dateStr > etStr) break;
-      days.push(dateStr);
-    }
-
-    const allSnap = await get(ref(db, 'members'));
-    let members = allSnap.exists() ? Object.keys(allSnap.val()).map(k => k.replace(/_/g, ' ')) : [];
-    const counts = {};
-    for (const d of days) {
-      const snap = await get(ref(db, `showup/${d}`));
-      if (snap.exists()) {
-        Object.keys(snap.val()).forEach(k => {
-          const name = k.replace(/_/g, ' ');
-          counts[name] = (counts[name] || 0) + 1;
-        });
-      }
-    }
-    const board = document.getElementById('showBoard');
-    board.innerHTML = '';
-    members.sort((a, b) => (counts[b] || 0) - (counts[a] || 0));
-    members.forEach(name => {
-      const isMe = name.toLowerCase() === myName.toLowerCase();
-      const c = counts[name] || 0;
-      const div = document.createElement('div');
-      div.className = 'board-row' + (isMe ? ' me' : '') + (c > 0 ? ' logged-show' : '');
-      div.innerHTML = `
-        <div class="board-avatar${isMe ? ' me' : ''}">${initials(name)}</div>
-        <div class="board-info">
-          <div class="board-name${isMe ? ' me' : ''}">${name}</div>
-          ${c === 0 ? `<div class="not-yet-lbl">none this week yet</div>` : ''}
-        </div>
-        <div>
-          <div class="board-steps${isMe ? ' me' : ''}${c === 0 ? ' zero' : ''}">${c > 0 ? c : '—'}</div>
-          <div class="board-unit">${c === 1 ? 'day' : c > 1 ? 'days' : ''}</div>
-        </div>`;
-      board.appendChild(div);
-    });
-  }
-
-  // ── CONNECT ───────────────────────────────────────────────────────────────
-  window.logConnect = async function() {
-    const key = myName.replace(/\s/g, '_');
-    const path = `connect/${monthKey()}/${key}`;
-    const snap = await get(ref(db, path));
-    const cur = snap.exists() ? (snap.val() || 0) : 0;
-    await set(ref(db, path), cur + 1);
-    const msg = document.getElementById('connectSavedMsg');
-    msg.textContent = '✓ Hangout logged!';
-    setTimeout(() => msg.textContent = '', 2500);
-    if (cur + 1 === 2) showMilestone('🤝', 'Monthly goal hit!', 'Two connects this month. That\'s love.');
-    loadMyConnectDots();
-    loadConnectBoard();
-  };
-
-  async function loadMyConnectDots() {
-    const key = myName.replace(/\s/g, '_');
-    const snap = await get(ref(db, `connect/${monthKey()}/${key}`));
-    const count = snap.exists() ? (snap.val() || 0) : 0;
-    document.getElementById('dot1').className = 'dot' + (count >= 1 ? ' done' : '');
-    document.getElementById('dot1').textContent = count >= 1 ? '✓' : '';
-    document.getElementById('dot2').className = 'dot' + (count >= 2 ? ' done' : '');
-    document.getElementById('dot2').textContent = count >= 2 ? '✓' : '';
-  }
-
-  async function loadConnectBoard() {
-    const allSnap = await get(ref(db, 'members'));
-    let members = allSnap.exists() ? Object.keys(allSnap.val()).map(k => ({ key: k, name: k.replace(/_/g, ' ') })) : [];
-    const counts = {};
-    for (const m of members) {
-      const snap = await get(ref(db, `connect/${monthKey()}/${m.key}`));
-      counts[m.name] = snap.exists() ? (snap.val() || 0) : 0;
-    }
-    members.sort((a, b) => (counts[b.name] || 0) - (counts[a.name] || 0));
-    const board = document.getElementById('connectBoard');
-    board.innerHTML = '';
-    members.forEach(m => {
-      const isMe = m.name.toLowerCase() === myName.toLowerCase();
-      const c = counts[m.name] || 0;
-      const div = document.createElement('div');
-      div.className = 'board-row' + (isMe ? ' me' : '') + (c > 0 ? ' logged-connect' : '');
-      div.innerHTML = `
-        <div class="board-avatar${isMe ? ' me' : ''}">${initials(m.name)}</div>
-        <div class="board-info">
-          <div class="board-name${isMe ? ' me' : ''}">${m.name}</div>
-          ${c === 0 ? `<div class="not-yet-lbl">no hangouts logged yet</div>` : ''}
-          ${c >= 2 ? `<div style="font-size:10px;color:var(--rose);margin-top:2px;">Monthly goal reached 😊</div>` : ''}
-        </div>
-        <div>
-          <div class="board-steps${isMe ? ' me' : ''}${c === 0 ? ' zero' : ''}">${c > 0 ? c : '—'}</div>
-          <div class="board-unit">${c > 0 ? 'this month' : ''}</div>
-        </div>`;
-      board.appendChild(div);
-    });
-  }
-
-  // ── Reactions ─────────────────────────────────────────────────────────────
-  async function loadReacts(habit, name, idx, prefix) {
-    const key = name.replace(/\s/g, '_');
-    const snap = await get(ref(db, `reacts/${habit}/${currentReactKey}/${key}`));
-    const data = snap.exists() ? snap.val() : {};
-    const zone = document.getElementById(`${prefix}-${idx}`);
-    if (!zone) return;
-    const isMe = name.toLowerCase() === myName.toLowerCase();
-    const chips = Object.entries(data).filter(([, c]) => c > 0)
-      .map(([e, c]) => `<button class="react-chip" onclick="addReact('${habit}','${name}',${idx},'${e}','${prefix}')">${e} ${c}</button>`).join('');
-    const addBtn = isMe ? '' :
-      `<button class="react-add" onclick="togglePicker('${prefix}-picker-${idx}')">+ react</button>
-       <div class="picker" id="${prefix}-picker-${idx}">${EMOJI.map(e => `<span style="font-size:18px;cursor:pointer;margin-right:4px" onclick="addReact('${habit}','${name}',${idx},'${e}','${prefix}')">${e}</span>`).join('')}</div>`;
-    zone.innerHTML = chips + addBtn;
-  }
-
-  window.togglePicker = function(id) {
-    const p = document.getElementById(id);
-    if (p) p.classList.toggle('open');
-  };
-
-  window.addReact = async function(habit, name, idx, emoji, prefix) {
-    const key = name.replace(/\s/g, '_');
-    const path = `reacts/${habit}/${currentReactKey}/${key}/${emoji}`;
-    const snap = await get(ref(db, path));
-    await set(ref(db, path), (snap.exists() ? snap.val() : 0) + 1);
-    const p = document.getElementById(`${prefix}-picker-${idx}`);
-    if (p) p.classList.remove('open');
-    loadReacts(habit, name, idx, prefix);
-  };
-
-  // ── Milestone ─────────────────────────────────────────────────────────────
-  function showMilestone(emoji, title, sub) {
-    document.getElementById('mEmoji').textContent = emoji;
-    document.getElementById('mTitle').textContent = title;
-    document.getElementById('mSub').textContent   = sub;
-    const m = document.getElementById('milestone');
-    m.classList.add('show');
-    setTimeout(() => m.classList.remove('show'), 3500);
-  }
-
-  // ── Init ──────────────────────────────────────────────────────────────────
-  if (myName) {
-    document.getElementById('joinScreen').style.display = 'none';
-    showApp();
-  } else {
-    document.getElementById('mainHeader').classList.add('hidden');
-  }
-
-  document.getElementById('joinInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') joinBoard();
-  });
-
-  // Register service worker for PWA / offline support
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    const map = { move: 'Move', show: 'Show', connect: 'Connect' };
+    const classes = { move: 'active-move', show: 'active-show', connect: 'active-connect' };
+    document.getElementById('tab'+map[h]).className = 'habit-tab ' + classes[h];
+    document.getElementById('panel'+map[h]).classList.add('visible');
   }
 </script>
 </body>
