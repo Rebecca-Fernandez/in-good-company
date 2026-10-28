@@ -1,4 +1,4 @@
-const CACHE_NAME = 'igc-v1';
+const CACHE_NAME = 'igc-v2';
 const ASSETS = [
   '/',
   '/index.html'
