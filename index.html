@@ -707,10 +707,17 @@
       </div>
     </div>
 
-    <div class="join-box">
+    <div class="join-box" id="joinBox">
       <div class="join-prompt">What should we call you? Alias names welcomed.</div>
       <input class="join-input" id="joinInput" type="text" placeholder="Your name" autocomplete="off"/>
-      <button class="join-btn" onclick="joinBoard()">Let's go!</button>
+      <button class="join-btn" onclick="confirmName()">Let's go!</button>
+    </div>
+
+    <div class="join-box" id="confirmBox" style="display:none; text-align:center;">
+      <div style="font-family:'DM Serif Display',serif; font-size:26px; color:var(--text); margin-bottom:8px;" id="confirmNameDisplay"></div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:24px;">Is this the name you want to use?</div>
+      <button class="join-btn" onclick="joinBoard()" style="margin-bottom:10px;">Yes, that's me!</button>
+      <button onclick="backToName()" style="width:100%; background:none; border:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; padding:8px;">Change name</button>
     </div>
   </div>
 
@@ -890,6 +897,19 @@
     });
 
   // ── Join ──────────────────────────────────────────────────────────────────
+  window.confirmName = function() {
+    const name = document.getElementById('joinInput').value.trim();
+    if (!name) return;
+    document.getElementById('confirmNameDisplay').textContent = name;
+    document.getElementById('joinBox').style.display = 'none';
+    document.getElementById('confirmBox').style.display = 'block';
+  };
+
+  window.backToName = function() {
+    document.getElementById('confirmBox').style.display = 'none';
+    document.getElementById('joinBox').style.display = 'block';
+  };
+
   window.joinBoard = async function() {
     const name = document.getElementById('joinInput').value.trim();
     if (!name) return;
