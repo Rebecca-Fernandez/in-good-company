@@ -794,10 +794,7 @@
         </div>
       </div>
 
-      <div class="section-label">How everyone's moving today</div>
-      <div id="moveBoard"></div>
-
-      <div class="section-label" style="margin-top:28px;" id="monthlyMoveLbl">Monthly steps · <span id="monthNameLbl" style="color:var(--text);font-weight:400;"></span></div>
+      <div class="section-label" id="monthlyMoveLbl">Monthly steps · <span id="monthNameLbl" style="color:var(--text);font-weight:400;"></span></div>
       <div id="monthlyMoveBoard"></div>
     </div>
 
@@ -955,7 +952,7 @@
 
     // Real-time listener for steps
     onValue(ref(db, `steps/${today()}`), () => {
-      if (currentHabit === 'move') { loadMoveBoard(); loadMonthlyStepsBoard(); }
+      if (currentHabit === 'move') { loadMonthlyStepsBoard(); }
     });
   }
 
@@ -972,7 +969,7 @@
 
     document.getElementById(`panel${h.charAt(0).toUpperCase()+h.slice(1)}`).classList.add('visible');
 
-    if (h === 'move')    { loadMoveBoard(); loadMonthlyStepsBoard(); }
+    if (h === 'move')    { loadMonthlyStepsBoard(); }
     if (h === 'show')    loadShowBoard();
     if (h === 'connect') loadConnectBoard();
   };
@@ -989,7 +986,6 @@
     msg.textContent = `✓ ${fmt(amount)} steps logged`;
     setTimeout(() => msg.textContent = '', 2500);
     if (amount >= stepGoal) showMilestone('🏆', 'Goal crushed!', `${fmt(amount)} steps today.`);
-    loadMoveBoard();
     loadMonthlyStepsBoard();
   };
 
@@ -1035,47 +1031,8 @@
     document.getElementById('pastStepAmt').value = '';
   };
 
-  async function loadMoveBoard() {
-    const snap = await get(ref(db, `steps/${today()}`));
-    const data = snap.exists() ? snap.val() : {};
-    const allSnap = await get(ref(db, 'members'));
-    let players = [];
-    if (allSnap.exists()) {
-      players = Object.keys(allSnap.val()).map(k => ({
-        name: k.replace(/_/g, ' '),
-        key: k,
-        steps: parseInt(data[k] || 0)
-      }));
-    }
-    players.sort((a, b) => b.steps - a.steps);
-    currentReactKey = today();
-
-    const board = document.getElementById('moveBoard');
-    board.innerHTML = '';
-    if (players.length === 0) {
-      board.innerHTML = `<div style="text-align:center;padding:30px 0;color:var(--muted);font-size:12px;">No one's logged yet. Be first.</div>`;
-      return;
-    }
-    players.forEach((p, i) => {
-      const isMe = p.name.toLowerCase() === myName.toLowerCase();
-      const hasLogged = p.steps > 0;
-      const div = document.createElement('div');
-      div.className = 'board-row' + (isMe ? ' me' : '');
-      div.innerHTML = `
-        <div class="board-avatar${isMe ? ' me' : ''}">${initials(p.name)}</div>
-        <div class="board-info">
-          <div class="board-name${isMe ? ' me' : ''}">${p.name}</div>
-          ${!hasLogged ? `<div class="not-yet-lbl">hasn't logged yet</div>` : ''}
-          <div class="reacts" id="mreacts-${i}"></div>
-        </div>
-        <div>
-          <div class="board-steps${isMe ? ' me' : ''}${!hasLogged ? ' zero' : ''}">${hasLogged ? fmt(p.steps) : '—'}</div>
-          <div class="board-unit">${hasLogged ? 'steps' : ''}</div>
-        </div>`;
-      board.appendChild(div);
-      if (hasLogged) loadReacts('move', p.name, i, 'mreacts');
-    });
-  }
+  // Daily board merged into the monthly leaderboard below
+  async function loadMoveBoard() { return loadMonthlyStepsBoard(); }
 
   // ── MONTHLY STEPS ─────────────────────────────────────────────────────────
   async function loadMonthlyStepsBoard() {
@@ -1100,41 +1057,30 @@
       : [];
 
     const totals = {};
-    members.forEach(m => { totals[m.name] = 0; });
+    const daysLogged = {};
+    const todaySteps = {};
+    members.forEach(m => { totals[m.name] = 0; daysLogged[m.name] = 0; todaySteps[m.name] = 0; });
+    let teamToday = 0;
 
+    // Only days in the current month are counted, so the board resets on the 1st
     for (const day of days) {
       const snap = await get(ref(db, `steps/${day}`));
-      if (snap.exists()) {
-        const data = snap.val();
-        members.forEach(m => {
-          if (data[m.key]) totals[m.name] += parseInt(data[m.key]) || 0;
-        });
-      }
+      if (!snap.exists()) continue;
+      const data = snap.val();
+      members.forEach(m => {
+        const v = parseInt(data[m.key]) || 0;
+        if (v > 0) {
+          totals[m.name] += v;
+          daysLogged[m.name]++;
+          if (day === etStr) { todaySteps[m.name] = v; teamToday += v; }
+        }
+      });
     }
 
     members.sort((a, b) => totals[b.name] - totals[a.name]);
-
-    // Count days logged per person (most active)
-    const daysLogged = {};
-    members.forEach(m => { daysLogged[m.name] = 0; });
-    for (const day of days) {
-      const snap = await get(ref(db, `steps/${day}`));
-      if (snap.exists()) {
-        const data = snap.val();
-        members.forEach(m => { if (data[m.key] && parseInt(data[m.key]) > 0) daysLogged[m.name]++; });
-      }
-    }
     const mostActive = members.slice().sort((a, b) => daysLogged[b.name] - daysLogged[a.name])[0];
-
-    // Monthly total
     const monthTotal = Object.values(totals).reduce((s, v) => s + v, 0);
-
-    // Today's team total
-    const todaySnap = await get(ref(db, `steps/${today()}`));
-    let teamToday = 0;
-    if (todaySnap.exists()) {
-      Object.values(todaySnap.val()).forEach(v => { teamToday += parseInt(v) || 0; });
-    }
+    currentReactKey = etStr;
 
     // Update stats tiles
     document.getElementById('statTeamToday').textContent = teamToday > 0 ? fmt(teamToday) : '—';
@@ -1153,22 +1099,35 @@
 
     const board = document.getElementById('monthlyMoveBoard');
     board.innerHTML = '';
-    members.forEach(m => {
+    if (members.length === 0) {
+      board.innerHTML = `<div style="text-align:center;padding:30px 0;color:var(--muted);font-size:12px;">No one's logged yet. Be first.</div>`;
+      return;
+    }
+    members.forEach((m, i) => {
       const isMe = m.name.toLowerCase() === myName.toLowerCase();
       const total = totals[m.name];
+      const t = todaySteps[m.name];
+      const rank = total > 0 ? (i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : '') : '';
+      const sub = total === 0
+        ? `<div class="not-yet-lbl">no steps logged yet</div>`
+        : t > 0
+          ? `<div class="board-unit" style="text-align:left;margin-top:2px;">+${fmt(t)} today</div>`
+          : `<div class="not-yet-lbl">hasn't logged today</div>`;
       const div = document.createElement('div');
       div.className = 'board-row' + (isMe ? ' me' : '');
       div.innerHTML = `
         <div class="board-avatar${isMe ? ' me' : ''}">${initials(m.name)}</div>
         <div class="board-info">
-          <div class="board-name${isMe ? ' me' : ''}">${m.name}</div>
-          ${total === 0 ? `<div class="not-yet-lbl">no steps logged yet</div>` : ''}
+          <div class="board-name${isMe ? ' me' : ''}">${rank}${m.name}</div>
+          ${sub}
+          <div class="reacts" id="mreacts-${i}"></div>
         </div>
         <div>
           <div class="board-steps${isMe ? ' me' : ''}${total === 0 ? ' zero' : ''}">${total > 0 ? fmt(total) : '—'}</div>
           <div class="board-unit">${total > 0 ? 'this month' : ''}</div>
         </div>`;
       board.appendChild(div);
+      if (t > 0) loadReacts('move', m.name, i, 'mreacts');
     });
   }
 
