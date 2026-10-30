@@ -258,6 +258,8 @@
 
     .log-input {
       flex: 1;
+      min-width: 0;
+      width: 100%;
       background: var(--bg);
       border: 1px solid var(--border);
       border-bottom: 2px solid var(--warm);
@@ -275,6 +277,7 @@
     .log-input.rose-accent { border-bottom-color: var(--rose); }
 
     .log-btn {
+      flex-shrink: 0;
       background: var(--warm);
       border: none;
       color: var(--bg);
@@ -294,6 +297,29 @@
     .saved-msg { font-size: 11px; color: var(--warm); height: 16px; }
     .saved-msg.sage { color: var(--sage); }
     .saved-msg.rose { color: var(--rose); }
+    .today-logged { font-size: 11px; color: var(--muted); margin-top: 6px; min-height: 14px; }
+    .today-logged strong { color: var(--text); font-weight: 500; }
+    .goal-readout { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: right; }
+    .goal-readout strong { color: var(--warm); font-weight: 500; }
+    .past-existing { font-size: 11px; color: var(--muted); margin-top: 6px; min-height: 14px; }
+    .merge-banner {
+      background: var(--warm-dim);
+      border: 1px solid var(--warm);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .merge-banner .merge-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .merge-banner button {
+      flex: 1; padding: 10px 8px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; cursor: pointer;
+    }
+    .merge-yes { background: var(--warm); color: var(--bg); border: none; font-weight: 600; }
+    .merge-no  { background: none; color: var(--muted); border: 1px solid var(--border2); }
+    .match-note { font-size: 13px; color: var(--warm); margin-bottom: 16px; line-height: 1.45; }
 
     /* ── Check-in button (Show Up) ── */
     .checkin-btn {
@@ -715,8 +741,10 @@
 
     <div class="join-box" id="confirmBox" style="display:none; text-align:center;">
       <div style="font-family:'DM Serif Display',serif; font-size:26px; color:var(--text); margin-bottom:8px;" id="confirmNameDisplay"></div>
-      <div style="font-size:13px; color:var(--muted); margin-bottom:24px;">Is this the name you want to use?</div>
-      <button class="join-btn" onclick="joinBoard()" style="margin-bottom:10px;">Yes, that's me!</button>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:24px;" id="confirmQuestion">Is this the name you want to use?</div>
+      <div class="match-note" id="matchNote" style="display:none;"></div>
+      <button class="join-btn" id="matchBtn" onclick="joinAsMatch()" style="margin-bottom:10px; display:none;"></button>
+      <button class="join-btn" id="joinYesBtn" onclick="joinBoard()" style="margin-bottom:10px;">Yes, that's me!</button>
       <button onclick="backToName()" style="width:100%; background:none; border:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; padding:8px;">Change name</button>
     </div>
   </div>
@@ -749,6 +777,7 @@
           <input type="number" placeholder="0000" class="log-input" id="stepInput"/>
           <button class="log-btn" onclick="logSteps()">Save</button>
         </div>
+        <div class="today-logged" id="todayLogged"></div>
         <div class="saved-msg" id="stepSavedMsg"></div>
 
         <div class="goal-row" style="margin-top:10px;">
@@ -756,18 +785,23 @@
           <input type="number" class="goal-input-small" id="stepGoalInput" value="8000" onchange="updateStepGoal()"/>
         </div>
         <div class="goal-track"><div class="goal-fill" id="stepGoalFill" style="width:0%"></div></div>
+        <div class="goal-readout" id="goalReadout"></div>
 
         <button class="past-toggle" onclick="togglePastSteps()">+ Log a past day</button>
         <div id="pastStepsRow" style="display:none;" class="past-row">
           <div style="font-size:10px;color:var(--muted);">Which day?</div>
           <div class="past-row-inner">
-            <select class="past-select" id="pastDaySelect"></select>
+            <select class="past-select" id="pastDaySelect" onchange="checkPastDay()"></select>
             <input type="number" placeholder="steps" class="past-amount" id="pastStepAmt"/>
             <button class="past-save" onclick="logPastSteps()">Save</button>
           </div>
+          <div class="past-existing" id="pastExisting"></div>
           <div class="saved-msg" id="pastStepMsg" style="margin-top:6px;"></div>
         </div>
       </div>
+
+      <!-- Duplicate profile check -->
+      <div id="mergeBanner" class="merge-banner" style="display:none;"></div>
 
       <!-- Leader + stats -->
       <div id="leaderCard" style="display:none;" class="leader-card">
@@ -836,7 +870,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { getDatabase, ref, set, get, remove, onValue, query, orderByKey, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
   // ── REPLACE WITH YOUR FIREBASE CONFIG ──────────────────────────────────────
   const firebaseConfig = {
@@ -887,6 +921,38 @@
     return name.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
 
+  function keyOf(name) { return name.trim().replace(/\s+/g, '_'); }
+
+  // Edit distance, used to spot near-duplicate names (typos, missing letters)
+  function levenshtein(a, b) {
+    a = a.toLowerCase(); b = b.toLowerCase();
+    const dp = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i][j] = Math.min(dp[i-1][j] + 1, dp[i][j-1] + 1,
+          dp[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+      }
+    }
+    return dp[a.length][b.length];
+  }
+
+  // Returns the closest existing member name within 2 letters, or null
+  function findSimilar(name, memberNames) {
+    let best = null, bestD = 99;
+    memberNames.forEach(n => {
+      if (n === name) return;
+      const d = levenshtein(n, name);
+      if (d <= 2 && d < bestD) { best = n; bestD = d; }
+    });
+    return best;
+  }
+
+  async function getMemberNames() {
+    const snap = await get(ref(db, 'members'));
+    return snap.exists() ? Object.keys(snap.val()).map(k => k.replace(/_/g, ' ')) : [];
+  }
+
   // ── Date label ────────────────────────────────────────────────────────────
   document.getElementById('dateLbl').textContent =
     new Date().toLocaleDateString('en-US', {
@@ -894,12 +960,48 @@
     });
 
   // ── Join ──────────────────────────────────────────────────────────────────
-  window.confirmName = function() {
-    const name = document.getElementById('joinInput').value.trim();
+  let joinMatch = null;
+
+  window.confirmName = async function() {
+    const name = document.getElementById('joinInput').value.trim().replace(/\s+/g, ' ');
     if (!name) return;
+    const names = await getMemberNames();
+    // Exact match ignoring capitals: just use the existing profile
+    const exact = names.find(n => n.toLowerCase() === name.toLowerCase());
+    joinMatch = exact && exact !== name ? exact : (exact ? null : findSimilar(name, names));
+
     document.getElementById('confirmNameDisplay').textContent = name;
+    const note = document.getElementById('matchNote');
+    const matchBtn = document.getElementById('matchBtn');
+    const yesBtn = document.getElementById('joinYesBtn');
+    if (joinMatch) {
+      note.style.display = 'block';
+      note.textContent = `There's already someone here called "${joinMatch}". Is that you?`;
+      matchBtn.style.display = 'block';
+      matchBtn.textContent = `Yes, I'm ${joinMatch}`;
+      yesBtn.textContent = `No, I'm new (${name})`;
+      yesBtn.className = 'merge-no';
+      yesBtn.style.width = '100%';
+      yesBtn.style.padding = '12px';
+      document.getElementById('confirmQuestion').style.display = 'none';
+    } else {
+      note.style.display = 'none';
+      matchBtn.style.display = 'none';
+      yesBtn.textContent = "Yes, that's me!";
+      yesBtn.className = 'join-btn';
+      yesBtn.style.width = '';
+      yesBtn.style.padding = '';
+      document.getElementById('confirmQuestion').style.display = 'block';
+    }
     document.getElementById('joinBox').style.display = 'none';
     document.getElementById('confirmBox').style.display = 'block';
+  };
+
+  window.joinAsMatch = function() {
+    if (!joinMatch) return;
+    myName = joinMatch;
+    localStorage.setItem('igc-name', joinMatch);
+    showApp();
   };
 
   window.backToName = function() {
@@ -908,7 +1010,7 @@
   };
 
   window.joinBoard = async function() {
-    const name = document.getElementById('joinInput').value.trim();
+    const name = document.getElementById('joinInput').value.trim().replace(/\s+/g, ' ');
     if (!name) return;
     myName = name;
     localStorage.setItem('igc-name', name);
@@ -939,7 +1041,8 @@
     // Load my step goal bar
     const myKey = myName.replace(/\s/g, '_');
     const mySnap = await get(ref(db, `steps/${today()}/${myKey}`));
-    if (mySnap.exists()) updateStepGoalBar(mySnap.val());
+    updateStepGoalBar(mySnap.exists() ? mySnap.val() : 0);
+    updateTodayLogged(mySnap.exists() ? parseInt(mySnap.val()) || 0 : 0);
 
     // Load show up button state
     const showSnap = await get(ref(db, `showup/${today()}/${myKey}`));
@@ -950,10 +1053,95 @@
 
     switchHabit('move');
 
-    // Real-time listener for steps
-    onValue(ref(db, `steps/${today()}`), () => {
-      if (currentHabit === 'move') { loadMonthlyStepsBoard(); }
+    // Real-time listener for the whole month, so past-day logs from anyone show up live
+    attachMonthListener();
+    checkForDuplicate();
+  }
+
+  let monthData = {};
+  let monthUnsub = null;
+  let listenedMonth = '';
+  function monthQuery(mk) {
+    return query(ref(db, 'steps'), orderByKey(), startAt(`${mk}-01`), endAt(`${mk}-31`));
+  }
+  function attachMonthListener() {
+    const mk = monthKey();
+    if (monthUnsub && listenedMonth === mk) return;
+    if (monthUnsub) monthUnsub();
+    listenedMonth = mk;
+    monthUnsub = onValue(monthQuery(mk), snap => {
+      monthData = snap.exists() ? snap.val() : {};
+      renderMonthlyStepsBoard();
     });
+  }
+
+  // ── Duplicate profile merge ───────────────────────────────────────────────
+  async function checkForDuplicate() {
+    const banner = document.getElementById('mergeBanner');
+    const names = await getMemberNames();
+    let dismissed = [];
+    try { dismissed = JSON.parse(localStorage.getItem('igc-not-me') || '[]'); } catch (e) {}
+    const other = names.find(n => n !== myName && !dismissed.includes(n) &&
+      (n.toLowerCase() === myName.toLowerCase() || levenshtein(n, myName) <= 2));
+    if (!other) { banner.style.display = 'none'; return; }
+    banner.style.display = 'block';
+    banner.innerHTML = `
+      There's also a profile called <strong>${other}</strong>. Is that you too?
+      If so, we'll move its steps, workouts and hangouts into <strong>${myName}</strong>.
+      <div class="merge-actions">
+        <button class="merge-yes" id="mergeYesBtn">Yes, merge into mine</button>
+        <button class="merge-no" id="mergeNoBtn">No, different person</button>
+      </div>`;
+    document.getElementById('mergeYesBtn').onclick = () => mergeProfile(other);
+    document.getElementById('mergeNoBtn').onclick = () => {
+      dismissed.push(other);
+      try { localStorage.setItem('igc-not-me', JSON.stringify(dismissed)); } catch (e) {}
+      banner.style.display = 'none';
+    };
+  }
+
+  async function mergeProfile(otherName) {
+    const banner = document.getElementById('mergeBanner');
+    banner.innerHTML = 'Merging…';
+    const from = keyOf(otherName), to = keyOf(myName);
+
+    // Steps: keep the higher number on any day both profiles logged
+    const stepsSnap = await get(ref(db, 'steps'));
+    const allSteps = stepsSnap.exists() ? stepsSnap.val() : {};
+    for (const [date, day] of Object.entries(allSteps)) {
+      if (day && day[from] != null) {
+        const merged = Math.max(parseInt(day[from]) || 0, parseInt(day[to]) || 0);
+        await set(ref(db, `steps/${date}/${to}`), merged);
+        await remove(ref(db, `steps/${date}/${from}`));
+      }
+    }
+
+    // Workouts: a day counts if either profile logged it
+    const showSnap = await get(ref(db, 'showup'));
+    const allShow = showSnap.exists() ? showSnap.val() : {};
+    for (const [date, day] of Object.entries(allShow)) {
+      if (day && day[from]) {
+        await set(ref(db, `showup/${date}/${to}`), true);
+        await remove(ref(db, `showup/${date}/${from}`));
+      }
+    }
+
+    // Hangouts: keep the higher count for each month
+    const conSnap = await get(ref(db, 'connect'));
+    const allCon = conSnap.exists() ? conSnap.val() : {};
+    for (const [mk, month] of Object.entries(allCon)) {
+      if (month && month[from] != null) {
+        const merged = Math.max(parseInt(month[from]) || 0, parseInt(month[to]) || 0);
+        await set(ref(db, `connect/${mk}/${to}`), merged);
+        await remove(ref(db, `connect/${mk}/${from}`));
+      }
+    }
+
+    await remove(ref(db, `members/${from}`));
+    banner.innerHTML = `✓ Merged. <strong>${otherName}</strong> is now part of <strong>${myName}</strong>.`;
+    setTimeout(() => { banner.style.display = 'none'; }, 4000);
+    loadMyConnectDots();
+    loadMonthlyStepsBoard();
   }
 
   // ── Habit tabs ────────────────────────────────────────────────────────────
@@ -981,6 +1169,7 @@
     const key = myName.replace(/\s/g, '_');
     await set(ref(db, `steps/${today()}/${key}`), amount);
     updateStepGoalBar(amount);
+    updateTodayLogged(amount);
     document.getElementById('stepInput').value = '';
     const msg = document.getElementById('stepSavedMsg');
     msg.textContent = `✓ ${fmt(amount)} steps logged`;
@@ -989,15 +1178,29 @@
     loadMonthlyStepsBoard();
   };
 
+  let myTodaySteps = 0;
+
   function updateStepGoalBar(amount) {
+    myTodaySteps = parseInt(amount) || 0;
     const goal = parseInt(document.getElementById('stepGoalInput').value) || stepGoal;
-    const pct = Math.min(100, Math.round((amount / goal) * 100));
-    document.getElementById('stepGoalFill').style.width = pct + '%';
+    const rawPct = Math.round((myTodaySteps / goal) * 100);
+    document.getElementById('stepGoalFill').style.width = Math.min(100, rawPct) + '%';
+    document.getElementById('goalReadout').innerHTML = rawPct >= 100
+      ? `<strong>${fmt(myTodaySteps)}</strong> of ${fmt(goal)} · goal reached 🎉`
+      : `<strong>${fmt(myTodaySteps)}</strong> of ${fmt(goal)} · ${rawPct}%`;
+  }
+
+  function updateTodayLogged(amount) {
+    const el = document.getElementById('todayLogged');
+    el.innerHTML = amount > 0
+      ? `Logged today: <strong>${fmt(amount)}</strong> · saving again replaces this number`
+      : '';
   }
 
   window.updateStepGoal = function() {
     stepGoal = parseInt(document.getElementById('stepGoalInput').value) || 8000;
     localStorage.setItem('igc-step-goal', stepGoal);
+    updateStepGoalBar(myTodaySteps);
   };
 
   window.togglePastSteps = function() {
@@ -1017,7 +1220,21 @@
         opt.textContent = lbl;
         sel.appendChild(opt);
       }
+      checkPastDay();
     }
+  };
+
+  window.checkPastDay = async function() {
+    const date = document.getElementById('pastDaySelect').value;
+    const el = document.getElementById('pastExisting');
+    if (!date) { el.textContent = ''; return; }
+    el.textContent = '';
+    const snap = await get(ref(db, `steps/${date}/${keyOf(myName)}`));
+    if (document.getElementById('pastDaySelect').value !== date) return; // changed meanwhile
+    const v = snap.exists() ? parseInt(snap.val()) || 0 : 0;
+    el.innerHTML = v > 0
+      ? `Already saved: <strong style="color:var(--text);font-weight:500;">${fmt(v)}</strong> · saving replaces it`
+      : 'Nothing saved for this day yet';
   };
 
   window.logPastSteps = async function() {
@@ -1026,16 +1243,30 @@
     if (!amount || !date) return;
     await set(ref(db, `steps/${date}/${myName.replace(/\s/g, '_')}`), amount);
     const msg = document.getElementById('pastStepMsg');
-    msg.textContent = `✓ Saved`;
-    setTimeout(() => msg.textContent = '', 2500);
+    const dayLbl = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    msg.textContent = `✓ ${fmt(amount)} steps saved for ${dayLbl}`;
+    setTimeout(() => msg.textContent = '', 3000);
     document.getElementById('pastStepAmt').value = '';
+    checkPastDay();
+    loadMonthlyStepsBoard();
   };
 
   // Daily board merged into the monthly leaderboard below
   async function loadMoveBoard() { return loadMonthlyStepsBoard(); }
 
   // ── MONTHLY STEPS ─────────────────────────────────────────────────────────
+  // Fetches the whole month in one request, then renders
   async function loadMonthlyStepsBoard() {
+    attachMonthListener();
+    const snap = await get(monthQuery(monthKey()));
+    monthData = snap.exists() ? snap.val() : {};
+    await renderMonthlyStepsBoard();
+  }
+
+  let renderSeq = 0;
+  async function renderMonthlyStepsBoard() {
+    if (currentHabit !== 'move') return;
+    const seq = ++renderSeq;
     const mk = monthKey(); // YYYY-MM
     const etStr = today();
     const todayDate = new Date(etStr + 'T12:00:00');
@@ -1062,11 +1293,12 @@
     members.forEach(m => { totals[m.name] = 0; daysLogged[m.name] = 0; todaySteps[m.name] = 0; });
     let teamToday = 0;
 
+    if (seq !== renderSeq) return; // a newer render started while we waited
+
     // Only days in the current month are counted, so the board resets on the 1st
     for (const day of days) {
-      const snap = await get(ref(db, `steps/${day}`));
-      if (!snap.exists()) continue;
-      const data = snap.val();
+      const data = monthData[day];
+      if (!data) continue;
       members.forEach(m => {
         const v = parseInt(data[m.key]) || 0;
         if (v > 0) {
@@ -1076,6 +1308,10 @@
         }
       });
     }
+
+    const myToday = parseInt((monthData[etStr] || {})[keyOf(myName)]) || 0;
+    updateStepGoalBar(myToday);
+    updateTodayLogged(myToday);
 
     members.sort((a, b) => totals[b.name] - totals[a.name]);
     const mostActive = members.slice().sort((a, b) => daysLogged[b.name] - daysLogged[a.name])[0];
@@ -1127,7 +1363,7 @@
           <div class="board-unit">${total > 0 ? 'this month' : ''}</div>
         </div>`;
       board.appendChild(div);
-      if (t > 0) loadReacts('move', m.name, i, 'mreacts');
+      if (total > 0) loadReacts('move', m.name, i, 'mreacts');
     });
   }
 
@@ -1167,10 +1403,11 @@
     const allSnap = await get(ref(db, 'members'));
     let members = allSnap.exists() ? Object.keys(allSnap.val()).map(k => k.replace(/_/g, ' ')) : [];
     const counts = {};
+    const weekSnap = await get(query(ref(db, 'showup'), orderByKey(), startAt(days[0]), endAt(days[days.length - 1])));
+    const weekData = weekSnap.exists() ? weekSnap.val() : {};
     for (const d of days) {
-      const snap = await get(ref(db, `showup/${d}`));
-      if (snap.exists()) {
-        Object.keys(snap.val()).forEach(k => {
+      if (weekData[d]) {
+        Object.keys(weekData[d]).forEach(k => {
           const name = k.replace(/_/g, ' ');
           counts[name] = (counts[name] || 0) + 1;
         });
@@ -1227,10 +1464,9 @@
     const allSnap = await get(ref(db, 'members'));
     let members = allSnap.exists() ? Object.keys(allSnap.val()).map(k => ({ key: k, name: k.replace(/_/g, ' ') })) : [];
     const counts = {};
-    for (const m of members) {
-      const snap = await get(ref(db, `connect/${monthKey()}/${m.key}`));
-      counts[m.name] = snap.exists() ? (snap.val() || 0) : 0;
-    }
+    const conSnap = await get(ref(db, `connect/${monthKey()}`));
+    const conData = conSnap.exists() ? conSnap.val() : {};
+    members.forEach(m => { counts[m.name] = parseInt(conData[m.key]) || 0; });
     members.sort((a, b) => (counts[b.name] || 0) - (counts[a.name] || 0));
     const board = document.getElementById('connectBoard');
     board.innerHTML = '';
